@@ -28,7 +28,17 @@ namespace Arthware.X937Parser
                     var recordTypeBytes = GetRecord(binaryReader, 2);
                     Debug.WriteLine("Type " + recordTypeBytes);
                     Debug.WriteLine(string.Empty);
-                    if (recordTypeBytes == X937RecordType.ReturnRecord31)
+                    if (recordTypeBytes == X937RecordType.CashLetterHeader10)
+                    {
+                        var record = recordTypeBytes + GetRecord(binaryReader, recordLength - 2);
+                        var collectionTypeIndicator = GetCollectionTypeIndicatorFromCashLetterHeader10(record);
+                        Debug.WriteLine("Collection type " + collectionTypeIndicator);
+                        if (collectionTypeIndicator == X937CollectionType.ForwardPresentment)
+                        {
+                            break; // Ok, yes that's crap
+                        }
+                    }
+                    else if (recordTypeBytes == X937RecordType.ReturnRecord31)
                     {
                         var record = recordTypeBytes + GetRecord(binaryReader, recordLength - 2);
                         returns.Add(GetReturnFromReturnRecord31(record));
@@ -60,14 +70,30 @@ namespace Arthware.X937Parser
                 : base(recordType)
             {
             }
-
+            public static readonly X937RecordType CashLetterHeader10 = new X937RecordType("10");
             public static readonly X937RecordType ReturnRecord31 = new X937RecordType("31");
             public static readonly X937RecordType ReturnAddendumB33 = new X937RecordType("33");
+        }
+
+        private sealed class X937CollectionType : StringEnumBase
+        {
+            private X937CollectionType(string recordType)
+                : base(recordType)
+            {
+            }
+            public static readonly X937CollectionType ForwardPresentment = new X937CollectionType("01");
+            public static readonly X937CollectionType Return = new X937CollectionType("03");
         }
 
         private static string GetAuxiliaryOnUsFromReturnAddendumB33(string record)
         {
             return record.Substring(20, 15);
+        }
+
+        private static string GetCollectionTypeIndicatorFromCashLetterHeader10(string record)
+        {
+            //TODO: confirm 
+            return record.Substring(2, 2);
         }
 
         private static X937Return GetReturnFromReturnRecord31(string record)
@@ -93,6 +119,7 @@ namespace Arthware.X937Parser
         {
             return Encoding.Convert(Encoding.GetEncoding(EBCDIC_ENCODING), Encoding.ASCII, ebcdicData);
         }
+
         private static int GetRecordLength(IBinaryReader input)
         {
             const int RECORD_LENGTH_BYTES = 4;
