@@ -1,6 +1,6 @@
 # Arthware.X937Parser
 
-At the office we had a requirement to parse check returns from an X9.37 file.
+At the office we had a requirement for a microservice to parse check returns from an X9.37 file and emit metadata about each return.
 There is a commercial library/SDK for reading and writing X9.37 files.
 I recommended against using the library for our requirement:
 * For the purpose of interogating the X9.37 file for returns and returning an array of the discovered returns, we required only a very small subset of the libraries capabilities.  
@@ -17,4 +17,5 @@ Regardless, the management decision was to use the library.  I won't expand on t
 Since I built the demonstration project on my own time, I decided to open source it, in case anyone else has a similar requirement.
 
 If this project proves to be interesting in the wild then we can expand the functionality to parse other information out of X9.37 files, or whatever seems to be in demand.  If this project proves to be crickets, then there won't be any expansion of functionality.
+
 
