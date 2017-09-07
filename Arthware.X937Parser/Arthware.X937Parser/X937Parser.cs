@@ -6,7 +6,6 @@ using Arthware.X937Parser.Models;
 using Thinktecture.IO;
 using System.Text;
 using Thinktecture.IO.Adapters;
-using System.Diagnostics;
 using CFS.SkyNet.Common;
 
 namespace Arthware.X937Parser
@@ -24,15 +23,11 @@ namespace Arthware.X937Parser
                 var recordLength = GetRecordLength(binaryReader);
                 while (recordLength > 0)
                 {
-                    Debug.WriteLine("Length {0}", recordLength);
                     var recordTypeBytes = GetRecord(binaryReader, 2);
-                    Debug.WriteLine("Type " + recordTypeBytes);
-                    Debug.WriteLine(string.Empty);
                     if (recordTypeBytes == X937RecordType.CashLetterHeader10)
                     {
                         var record = recordTypeBytes + GetRecord(binaryReader, recordLength - 2);
                         var collectionTypeIndicator = GetCollectionTypeIndicatorFromCashLetterHeader10(record);
-                        Debug.WriteLine("Collection type " + collectionTypeIndicator);
                         if (collectionTypeIndicator == X937CollectionType.ForwardPresentment)
                         {
                             break; // Ok, yes that's crap
@@ -92,7 +87,6 @@ namespace Arthware.X937Parser
 
         private static string GetCollectionTypeIndicatorFromCashLetterHeader10(string record)
         {
-            //TODO: confirm 
             return record.Substring(2, 2);
         }
 
